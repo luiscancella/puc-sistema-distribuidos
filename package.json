@@ -2,7 +2,7 @@
   "name": "campus-quest",
   "version": "1.0.0",
   "main": "index.ts",
-"scripts": {
+  "scripts": {
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -18,7 +18,10 @@
     "build:preview:ios:local": "eas build --platform ios --profile preview --local"
   },
   "dependencies": {
+    "@react-navigation/bottom-tabs": "^7.15.9",
+    "@react-navigation/native": "^7.2.2",
     "expo": "~54.0.33",
+    "expo-dev-client": "~6.0.20",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
     "react-native": "0.81.5"
