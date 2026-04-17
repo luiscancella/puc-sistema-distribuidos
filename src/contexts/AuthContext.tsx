@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { AuthSession, SignInData, SignUpData } from "../types";
 
 type AuthContextType = {
@@ -48,4 +48,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export default AuthContext;
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  
+  return context;
+};
