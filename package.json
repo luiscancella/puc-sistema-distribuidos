@@ -2,11 +2,20 @@
   "name": "campus-quest",
   "version": "1.0.0",
   "main": "index.ts",
-  "scripts": {
+"scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "dev": "npx expo start --dev-client",
+    "dev:clear": "npx expo start --dev-client --clear",
+    "build:dev:android": "eas build --platform android --profile development",
+    "build:dev:android:local": "eas build --platform android --profile development --local",
+    "build:preview:android": "eas build --platform android --profile preview",
+    "build:preview:android:local": "eas build --platform android --profile preview --local",
+    "build:production:android:local": "eas build --platform android --profile production --local",
+    "build:dev:ios": "eas build --platform ios --profile development",
+    "build:preview:ios:local": "eas build --platform ios --profile preview --local"
   },
   "dependencies": {
     "expo": "~54.0.33",
