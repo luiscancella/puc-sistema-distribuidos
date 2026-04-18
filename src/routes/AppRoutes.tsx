@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import { useAuth } from "../contexts/AuthContext";
 import HomeScreen from "../screens/HomeScreen";
+import ScheduleScreen from "../screens/ScheduleScreen";
 import LoginScreen from "../screens/onboarding/LoginScreen";
 import RegisterScreen from "../screens/onboarding/RegisterScreen";
 import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
@@ -19,6 +20,7 @@ export function AppRoutes() {
       { session !== null ? (
           <Tab.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
             <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Schedule" component={ScheduleScreen} />
           </Tab.Navigator>
         ) : (
           <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
