@@ -2,11 +2,11 @@ import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/un
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 
-import { HomeScreen } from "../screens/HomeScreen";
-import { WelcomeScreen } from "../screens/onboarding/WelcomeScreen";
 import { useAuth } from "../contexts/AuthContext";
-import { LoginScreen } from "../screens/onboarding/LoginScreen";
-import { RegisterScreen } from "../screens/onboarding/RegisterScreen";
+import HomeScreen from "../screens/HomeScreen";
+import LoginScreen from "../screens/onboarding/LoginScreen";
+import RegisterScreen from "../screens/onboarding/RegisterScreen";
+import WelcomeScreen from "../screens/onboarding/WelcomeScreen";
 
 const Tab = createNativeBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -16,7 +16,7 @@ export function AppRoutes() {
 
   return (
     <NavigationContainer>
-      { session ? (
+      { session !== null ? (
           <Tab.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
             <Tab.Screen name="Home" component={HomeScreen} />
           </Tab.Navigator>
