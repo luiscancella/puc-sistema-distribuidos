@@ -15,5 +15,4 @@ export const ClassSessionSchema = z.object({
     attendance: z.array(AttendanceRecordSchema),
     realizedAt: z.string(),
 });
-
 export type ClassSession = z.infer<typeof ClassSessionSchema>;

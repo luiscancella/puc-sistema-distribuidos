@@ -1,6 +1,8 @@
 import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
+import { useFonts, BricolageGrotesque_700Bold } from "@expo-google-fonts/bricolage-grotesque";
+import { HankenGrotesk_500Medium, HankenGrotesk_800ExtraBold } from "@expo-google-fonts/hanken-grotesk";
 
 import { useAuth } from "../contexts/AuthContext";
 import HomeScreen from "../screens/HomeScreen";
@@ -14,6 +16,13 @@ const Stack = createNativeStackNavigator();
 
 export function AppRoutes() {
   const { session } = useAuth();
+  const [fontsLoaded] = useFonts({
+    BricolageGrotesque_700Bold,
+    HankenGrotesk_500Medium,
+    HankenGrotesk_800ExtraBold,
+  });
+
+  if (!fontsLoaded) return null;
 
   return (
     <NavigationContainer>
