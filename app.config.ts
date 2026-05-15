@@ -1,6 +1,6 @@
-{
+export default {
   "expo": {
-    "name": "campus-quest",
+    "name": "Campus Quest",
     "slug": "campus-quest",
     "version": "1.0.0",
     "orientation": "portrait",
