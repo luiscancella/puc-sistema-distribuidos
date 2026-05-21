@@ -52,7 +52,7 @@ export default function WelcomeScreen() {
                 </View>
 
                 <Pressable
-                    onPress={() => navigation.replace("Register")}
+                    onPress={() => navigation.navigate("Register")}
                     style={({ pressed }) => [
                         styles.primaryButton,
                         pressed && styles.primaryButtonPressed,
@@ -63,7 +63,7 @@ export default function WelcomeScreen() {
 
                 <View style={styles.secondaryActionRow}>
                     <Text style={styles.secondaryActionText}>Já tem uma conta? </Text>
-                    <Pressable onPress={() => navigation.replace("Login")}>
+                    <Pressable onPress={() => navigation.navigate("Login")}>
                         <Text style={styles.secondaryActionLink}>Entrar</Text>
                     </Pressable>
                 </View>

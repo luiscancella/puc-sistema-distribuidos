@@ -2,8 +2,8 @@ import z from "zod";
 import { UserSchema } from "../users/user.schema";
 
 export const SignInSchema = z.object({
-  email: z.email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
+  email: z.email("Digite um e-mail váilido"),
+  password: z.string().min(1, "Senha é obrigatória").min(6, "Senha deve conter no mínimo 6 caracteres"),
 });
 export type SignInData = z.infer<typeof SignInSchema>;
 

@@ -23,6 +23,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (data: SignInData) => {
     // TODO: Implement sign-in logic here
+    // 1. Validate credentials with backend
+    // 2. If valid, receive token and user info
     setSession({
       token: "dummy-token",
       user: {

@@ -25,7 +25,7 @@ export function AppRoutes() {
   if (!fontsLoaded) return null;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer> 
       { session !== null ? (
           <Tab.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
             <Tab.Screen name="Home" component={HomeScreen} />
