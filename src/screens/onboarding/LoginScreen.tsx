@@ -17,8 +17,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Colors, FontFamily, Radius, Shadow } from "../../constants/brand";
 import LogoMark from "../../components/LogoMark";
 import { useAuth } from "../../contexts/AuthContext";
-import { SignInData, SignInSchema } from "../../types/auth/auth.schema";
-import type { OnboardingStackParamList } from "../../types/navigation/onboarding.stack";
+import { OnboardingStackParamList, SignInData, SignInSchema } from "../../types";
+
+type LoginField = keyof SignInData;
 
 export default function LoginScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<OnboardingStackParamList>>();
@@ -29,11 +30,11 @@ export default function LoginScreen() {
     });
 
     const [showPassword, setShowPassword] = useState(false);
-    const [focusedField, setFocusedField] = useState<"email" | "password" | null>(null);
+    const [focusedField, setFocusedField] = useState<LoginField | null>(null);
     const [globalError, setGlobalError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const getBorderColor = (field: "email" | "password") => {
+    const getBorderColor = (field: LoginField) => {
         if (errors[field]) return "#E05A3A";
         if (focusedField === field) return Colors.peach;
         return Colors.hair;

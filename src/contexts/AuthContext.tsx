@@ -37,6 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (data: SignUpData) => {
     // TODO: Implement sign-up logic here
+    // 1. Send registration data to backend
+    // 2. If successful, receive token and user info
     setSession({
       token: "dummy-token",
       user: {
