@@ -25,73 +25,73 @@ const WEEKDAY_LABEL_BY_INDEX: Record<number, string> = {
 const initialSessions: ClassSession[] = [
     {
         id: "0d17ed61-fa92-4c7f-a101-b3ab0ce26837",
-        realizedAt: "2026-10-23T00:00:00.000Z",
-        attendance: [],
+        date: "2026-10-23",
         course: {
             id: "58b3a37f-d391-446a-82bc-d090f81817ff",
             shortLabel: "EDA",
             name: "Estruturas de Dados Avançadas",
             teacher: "Dr. Sterling",
             location: "Bloco de Engenharia, 402",
-            startsAt: "2026-10-23T10:00:00.000Z",
-            endsAt: "2026-10-23T11:30:00.000Z",
+            schedules: [
+                { id: "7c9e6679-7425-40de-944b-e07fc1f90ae7", day: "THURSDAY", startsAt: "10:00:00", endsAt: "11:30:00" },
+            ],
         },
+        schedule: { id: "7c9e6679-7425-40de-944b-e07fc1f90ae7", day: "THURSDAY", startsAt: "10:00:00", endsAt: "11:30:00" },
+        attendance: [],
     },
     {
         id: "5ab81098-33cd-40ee-a2fb-16d0f479f237",
-        realizedAt: "2026-10-23T00:00:00.000Z",
-        attendance: [],
+        date: "2026-10-23",
         course: {
             id: "f90ad0eb-b112-4dad-a748-c6f833495deb",
             shortLabel: "PSI",
             name: "Psicologia de UI/UX",
             teacher: "Prof. Miller",
             location: "Laboratório de Design B",
-            startsAt: "2026-10-23T13:00:00.000Z",
-            endsAt: "2026-10-23T14:30:00.000Z",
+            schedules: [
+                { id: "8c9e6679-7425-40de-944b-e07fc1f90ae8", day: "THURSDAY", startsAt: "13:00:00", endsAt: "14:30:00" },
+            ],
         },
+        schedule: { id: "8c9e6679-7425-40de-944b-e07fc1f90ae8", day: "THURSDAY", startsAt: "13:00:00", endsAt: "14:30:00" },
+        attendance: [],
     },
     {
         id: "2ba4dd7d-f0a7-4835-b19d-e26d7f0f339f",
-        realizedAt: "2026-10-25T00:00:00.000Z",
-        attendance: [],
+        date: "2026-10-25",
         course: {
             id: "ef2c2fd2-9bc9-46ee-abf3-2f9d903f9ec4",
             shortLabel: "SO",
             name: "Sistemas Operacionais",
             teacher: "Dr. Khan",
             location: "Laboratório de Computação 304",
-            startsAt: "2026-10-25T15:30:00.000Z",
-            endsAt: "2026-10-25T17:00:00.000Z",
+            schedules: [
+                { id: "9c9e6679-7425-40de-944b-e07fc1f90ae9", day: "SATURDAY", startsAt: "15:30:00", endsAt: "17:00:00" },
+            ],
         },
+        schedule: { id: "9c9e6679-7425-40de-944b-e07fc1f90ae9", day: "SATURDAY", startsAt: "15:30:00", endsAt: "17:00:00" },
+        attendance: [],
     },
 ];
 
-const formatHour = (value: string) => {
-    const parsed = new Date(value);
-
-    if (Number.isNaN(parsed.getTime())) {
-        return "--:--";
-    }
-
-    return parsed.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+const formatHour = (timeStr: string) => {
+    const match = timeStr.match(/^(\d{2}):(\d{2})/);
+    return match ? `${match[1]}:${match[2]}` : "--:--";
 };
 
 export default function ScheduleScreen() {
     const sessions = useMemo(
         () =>
             [...initialSessions].sort(
-                (a, b) => new Date(a.course.startsAt).getTime() - new Date(b.course.startsAt).getTime(),
+                (a, b) =>
+                    new Date(`${a.date}T${a.schedule.startsAt}`).getTime() -
+                    new Date(`${b.date}T${b.schedule.startsAt}`).getTime(),
             ),
         [],
     );
 
     const weekDays = useMemo(() => {
         return sessions.slice(0, 5).map((session, index) => {
-            const sessionDate = new Date(session.realizedAt);
+            const sessionDate = new Date(session.date);
             return {
                 id: session.id,
                 label: WEEKDAY_LABEL_BY_INDEX[sessionDate.getDay()] ?? "",
@@ -104,7 +104,7 @@ export default function ScheduleScreen() {
     const nextSessionId = useMemo(() => {
         const now = Date.now();
         const nextSession = sessions.find(
-            (session) => new Date(session.course.startsAt).getTime() >= now,
+            (session) => new Date(`${session.date}T${session.schedule.startsAt}`).getTime() >= now,
         );
 
         return nextSession?.id ?? sessions[0]?.id;
@@ -185,7 +185,7 @@ export default function ScheduleScreen() {
                                         session.id === nextSessionId ? styles.sessionTimeNext : null,
                                     ]}
                                 >
-                                    {formatHour(session.course.startsAt)} - {formatHour(session.course.endsAt)}
+                                    {formatHour(session.schedule.startsAt)}{session.schedule.endsAt ? ` — ${formatHour(session.schedule.endsAt)}` : ""}
                                 </Text>
                             </View>
 

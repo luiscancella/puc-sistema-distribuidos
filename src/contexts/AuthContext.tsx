@@ -11,26 +11,20 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // const [session, setSession] = useState<AuthSession | null>({
-  //     token: "dummy-token",
-  //     user: {
-  //       id: "user-id",
-  //       name: "User Name",
-  //       email: "user@example.com",
-  //     },
-  //   });
   const [session, setSession] = useState<AuthSession | null>(null);
 
   const signIn = async (data: SignInData) => {
     // TODO: Implement sign-in logic here
     // 1. Validate credentials with backend
-    // 2. If valid, receive token and user info
+    // 2. If valid, receive token and student info
     setSession({
       token: "dummy-token",
-      user: {
-        id: "user-id",
-        name: "User Name",
+      student: {
+        id: "00000000-0000-4000-a000-000000000001",
+        name: "Usuário",
         email: data.email,
+        university: { id: "00000000-0000-4000-a000-000000000010", name: "Universidade" },
+        courses: [],
       },
     });
   };
@@ -38,13 +32,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (data: SignUpData) => {
     // TODO: Implement sign-up logic here
     // 1. Send registration data to backend
-    // 2. If successful, receive token and user info
+    // 2. If successful, receive token and student info
     setSession({
       token: "dummy-token",
-      user: {
-        id: "user-id",
+      student: {
+        id: "00000000-0000-4000-a000-000000000001",
         name: data.name,
         email: data.email,
+        university: { id: data.universityId, name: "" },
+        courses: [],
       },
     });
   };
@@ -54,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{session, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ session, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
@@ -66,6 +62,6 @@ export const useAuth = () => {
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-  
+
   return context;
 };

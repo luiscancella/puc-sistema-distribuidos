@@ -1,18 +1,22 @@
 import { z } from "zod";
-import { CourseSchema } from "../courses/course.schema";
+import { CourseScheduleSchema, CourseSchema } from "../courses/course.schema";
 
 export const AttendanceRecordSchema = z.object({
     id: z.uuid(),
-    studentId: z.string(),
-    sessionId: z.string(),
-    isPresent: z.enum(["present", "absent"]).optional(),
-    timestamp: z.string(),  
+    studentId: z.uuid(),
+    sessionId: z.uuid(),
+    status: z.enum(["PRESENT", "ABSENT", "LATE"]).optional(),
+    markedAt: z.iso.datetime({ offset: true }),
 });
+
+export type AttendanceRecord = z.infer<typeof AttendanceRecordSchema>;
 
 export const ClassSessionSchema = z.object({
     id: z.uuid(),
     course: CourseSchema,
-    attendance: z.array(AttendanceRecordSchema),
-    realizedAt: z.string(),
+    schedule: CourseScheduleSchema,
+    attendance: z.array(AttendanceRecordSchema).optional(),
+    date: z.iso.date(),
 });
+
 export type ClassSession = z.infer<typeof ClassSessionSchema>;
