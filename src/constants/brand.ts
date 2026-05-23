@@ -10,6 +10,14 @@ export const Colors = {
     peachSoft: '#FFE2D6',
     mint:      '#9BD6B5',
     mintSoft:  '#D9F0E2',
+    lav:       '#C9B8FF',
+    lavSoft:   '#EBE2FF',
+    sky:       '#A8D4F5',
+    skySoft:   '#E2F0FA',
+    gold:      '#F5C76A',
+    goldSoft:  '#FBEDC9',
+    rose:      '#F4A6B8',
+    roseSoft:  '#FBE0E6',
 } as const;
 
 export const Radius = {

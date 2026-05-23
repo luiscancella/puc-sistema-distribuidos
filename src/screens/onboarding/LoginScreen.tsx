@@ -73,7 +73,6 @@ export default function LoginScreen() {
                 </View>
 
                 <View style={styles.form}>
-                    {/* Email */}
                     <Controller
                         control={control}
                         name="email"
@@ -102,7 +101,6 @@ export default function LoginScreen() {
                         )}
                     />
 
-                    {/* Password */}
                     <Controller
                         control={control}
                         name="password"
