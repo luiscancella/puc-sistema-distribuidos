@@ -45,7 +45,7 @@ export default function LoginScreen() {
         setLoading(true);
         try {
             console.log("Form data:", data);
-            // await signIn(data);
+            await signIn(data);
         } catch {
             console.info("Login failed");
             setGlobalError("Credenciais inválidas. Tente novamente.");
@@ -145,7 +145,6 @@ export default function LoginScreen() {
                     </View>
                 )}
 
-                {/* Primary button */}
                 <Pressable
                     onPress={handleSubmit(onSubmit)}
                     disabled={loading}
@@ -164,7 +163,7 @@ export default function LoginScreen() {
 
                 <View style={styles.footerRow}>
                     <Text style={styles.footerText}>Novo por aqui? </Text>
-                    <Pressable onPress={() => navigation.replace("Register")} hitSlop={8}>
+                    <Pressable onPress={() => navigation.navigate("Register")} hitSlop={8}>
                         <Text style={styles.footerLink}>Criar uma conta</Text>
                     </Pressable>
                 </View>

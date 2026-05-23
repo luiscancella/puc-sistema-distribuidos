@@ -4,8 +4,12 @@ export * from "./classes/class.schema";
 
 export * from "./courses/course.schema";
 
+export * from "./groups/group.schema";
+
 export * from "./university/university.schema";
 
 export * from "./users/user.schema";
 
 export * from "./navigation/onboarding.stack";
+
+export * from "./navigation/group-setup.stack";

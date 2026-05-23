@@ -5,6 +5,7 @@ type AuthContextType = {
   session: AuthSession | null;
   signIn: (data: SignInData) => Promise<void>;
   signUp: (data: SignUpData) => Promise<void>;
+  assignGroup: (groupId: string) => Promise<void>;
   signOut: () => void;
 };
 
@@ -15,34 +16,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (data: SignInData) => {
     // TODO: Implement sign-in logic here
-    // 1. Validate credentials with backend
-    // 2. If valid, receive token and student info
     setSession({
       token: "dummy-token",
       student: {
         id: "00000000-0000-4000-a000-000000000001",
         name: "Usuário",
         email: data.email,
-        university: { id: "00000000-0000-4000-a000-000000000010", name: "Universidade" },
-        courses: [],
       },
     });
   };
 
   const signUp = async (data: SignUpData) => {
     // TODO: Implement sign-up logic here
-    // 1. Send registration data to backend
-    // 2. If successful, receive token and student info
     setSession({
       token: "dummy-token",
       student: {
         id: "00000000-0000-4000-a000-000000000001",
         name: data.name,
         email: data.email,
-        university: { id: data.universityId, name: "" },
-        courses: [],
       },
     });
+  };
+
+  const assignGroup = async (groupId: string) => {
+    // TODO: call backend to register group membership
+    if (!session) return;
+    setSession({ ...session, student: { ...session.student, groupId } });
   };
 
   const signOut = () => {
@@ -50,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ session, signIn, signUp, assignGroup, signOut }}>
       {children}
     </AuthContext.Provider>
   );

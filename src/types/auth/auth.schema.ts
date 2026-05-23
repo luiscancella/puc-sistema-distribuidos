@@ -10,12 +10,9 @@ export type SignInData = z.infer<typeof SignInSchema>;
 export const SignUpSchema = z.object({
     name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
     email: z.email("Digite um e-mail válido"),
-    universityId: z.uuid("Selecione uma universidade"),
-    courseIds: z.array(z.uuid()).min(1, "Selecione pelo menos uma disciplina"),
     password: z.string().min(6, "Senha deve conter no mínimo 6 caracteres"),
     confirmPassword: z.string().min(1, "Confirmação de senha é obrigatória"),
-})
-.refine((data) => data.password === data.confirmPassword, {
+}).refine((d) => d.password === d.confirmPassword, {
     message: "As senhas não coincidem",
     path: ["confirmPassword"],
 });
