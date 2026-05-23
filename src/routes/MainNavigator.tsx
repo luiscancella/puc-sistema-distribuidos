@@ -4,10 +4,10 @@ import { Ionicons } from "@expo/vector-icons";
 
 import HomeScreen from "../screens/HomeScreen";
 import ScheduleScreen from "../screens/ScheduleScreen";
-import { AppStackParamList } from "../types";
+import { AppStackParamList, MainTabsParamList } from "../types";
 import CheckInNavigator from "./CheckInNavigator";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<MainTabsParamList>();
 const MainStack = createNativeStackNavigator<AppStackParamList>();
 
 function MainTabs() {
