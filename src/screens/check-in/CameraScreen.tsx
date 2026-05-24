@@ -133,7 +133,13 @@ export default function CameraScreen() {
 
             {/* Top bar */}
             <View style={styles.topBar}>
-                <View style={styles.iconBtn} />
+                <Pressable
+                    style={styles.iconBtn}
+                    onPress={() => navigation.goBack()}
+                    hitSlop={8}
+                >
+                    <Ionicons name="arrow-back" size={24} color="#fff" />
+                </Pressable>
                 <View style={styles.coursePill}>
                     <View style={styles.greenDot} />
                     <Text style={styles.coursePillText} numberOfLines={1}>

@@ -8,6 +8,8 @@ export * from "./courses/course.schema";
 
 export * from "./groups/group.schema";
 
+export * from "./home/home.schema";
+
 export * from "./university/university.schema";
 
 export * from "./users/user.schema";
