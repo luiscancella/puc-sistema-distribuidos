@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.9.0] — 2026-05-25
+
+### Added
+- `GroupsScreen` — full group screen with hero card (name, member count, weekly check-ins), invite card (shareable invite code), and members list with color-coded avatars and points ranking
+- `GroupMemberSchema` in `src/types/groups/group.schema.ts` — Zod schema embedding `StudentSchema` with `points` and `isCurrentUser` fields
+- `Groups` route added to `MainTabsParamList` in `src/types/navigation/app.stack.ts`
+
+### Changed
+- `GroupSchema` extended with `memberCount`, `memberLimit`, `inviteCode`, `weeklyCheckIns`, and `members` array (`GroupMemberSchema`)
+- `MainNavigator` — Schedule tab replaced by Groups tab with `people` Ionicons icon
+- `HomeScreen` — squad ranking migrated from flat `squadRanking` to `group.members`
+- `home.schema.ts` — `squadRanking` field replaced by a direct `GroupSchema` reference
+- `AuthContext` mock data updated to include a full `group` object with members
+
+---
+
+## [0.8.0] — 2026-05-24
+
+### Added
+- `HomeScreen` — full implementation with three UI states (loading, error, loaded): streak card, check-in card, and squad ranking with color-coded avatars and medal badges
+- `src/types/home/home.schema.ts` — Zod schemas for `HomeScreenData` (`streak`, `checkIn`, `squadRanking`)
+- Home type exports added to `src/types/index.ts` barrel
+
+### Changed
+- `HomeScreen` migrated from minimal placeholder to full component with `ScrollView`, `SafeAreaView`, ISO date formatters (`formatDeadline`, `formatDateLabel`), and avatar color rotation via `AVATAR_COLORS`
+- `CameraScreen` — minor navigation adjustments
+
+---
+
 ## [0.7.0] — 2026-05-23
 
 ### Added
