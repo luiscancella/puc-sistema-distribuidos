@@ -131,7 +131,6 @@ export default function CameraScreen() {
                 enableTorch={flash}
             />
 
-            {/* Top bar */}
             <View style={styles.topBar}>
                 <Pressable
                     style={styles.iconBtn}
@@ -155,7 +154,6 @@ export default function CameraScreen() {
                 </Pressable>
             </View>
 
-            {/* Error banner */}
             {error && (
                 <View style={styles.errorBanner}>
                     <Text style={styles.errorText}>{error}</Text>
@@ -165,7 +163,6 @@ export default function CameraScreen() {
                 </View>
             )}
 
-            {/* Countdown overlay */}
             {countdown > 0 && (
                 <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
                     <View style={styles.countdownOverlay}>
@@ -174,7 +171,6 @@ export default function CameraScreen() {
                 </View>
             )}
 
-            {/* Bottom controls */}
             <SafeAreaView edges={["bottom"]} style={styles.bottomControls}>
                 {countdown === 0 && !error && (
                     <Text style={styles.hint}>Toque para registrar presença</Text>

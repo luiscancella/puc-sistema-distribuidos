@@ -81,38 +81,47 @@ const MOCK_DATA: HomeScreenData = {
 		pointReward: 12,
 		dateLabel: "2026-05-24",
 	},
-	squadRanking: [
-		{
-			rank: 1,
-			student: {
-				id: "00000000-0000-4000-a000-000000000002",
-				name: "Maya R.",
-				email: "maya@puc.edu",
+	group: {
+		id: "00000000-0000-4000-a000-000000000010",
+		name: "Design '26",
+		memberCount: 6,
+		memberLimit: 12,
+		inviteCode: "D26-PULL",
+		weeklyCheckIns: 32,
+		courses: [],
+		members: [
+			{
+				student: { id: "00000000-0000-4000-a000-000000000002", name: "Maya R.", email: "maya@puc.edu" },
+				points: 1840,
+				isCurrentUser: false,
 			},
-			points: 1840,
-			isCurrentUser: false,
-		},
-		{
-			rank: 2,
-			student: {
-				id: "00000000-0000-4000-a000-000000000001",
-				name: "Você",
-				email: "user@puc.edu",
+			{
+				student: { id: "00000000-0000-4000-a000-000000000001", name: "Você", email: "user@puc.edu" },
+				points: 1720,
+				isCurrentUser: true,
 			},
-			points: 1720,
-			isCurrentUser: true,
-		},
-		{
-			rank: 3,
-			student: {
-				id: "00000000-0000-4000-a000-000000000003",
-				name: "Theo K.",
-				email: "theo@puc.edu",
+			{
+				student: { id: "00000000-0000-4000-a000-000000000003", name: "Theo K.", email: "theo@puc.edu" },
+				points: 1605,
+				isCurrentUser: false,
 			},
-			points: 1605,
-			isCurrentUser: false,
-		},
-	],
+			{
+				student: { id: "00000000-0000-4000-a000-000000000004", name: "Bruno P.", email: "bruno@puc.edu" },
+				points: 1322,
+				isCurrentUser: false,
+			},
+			{
+				student: { id: "00000000-0000-4000-a000-000000000005", name: "Sara M.", email: "sara@puc.edu" },
+				points: 1280,
+				isCurrentUser: false,
+			},
+			{
+				student: { id: "00000000-0000-4000-a000-000000000006", name: "Lucas C.", email: "lucas@puc.edu" },
+				points: 1104,
+				isCurrentUser: false,
+			},
+		],
+	},
 };
 
 type UIState = "loading" | "error" | "success";
@@ -255,7 +264,8 @@ export default function HomeScreen() {
 						</Pressable>
 					</View>
 					<View style={styles.squadList}>
-						{data!.squadRanking.map((entry) => {
+						{data!.group.members.slice(0, 3).map((entry, index) => {
+							const rank = index + 1;
 							const entryInitials = getInitials(entry.student.name);
 							return (
 								<View
@@ -266,7 +276,7 @@ export default function HomeScreen() {
 									]}
 								>
 									<Text style={styles.rankMedal}>
-										{MEDALS[entry.rank] ?? String(entry.rank)}
+										{MEDALS[rank] ?? String(rank)}
 									</Text>
 									<View
 										style={[

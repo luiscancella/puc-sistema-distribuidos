@@ -27,24 +27,24 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 const MOCK_UNIVERSITIES: University[] = [
-    { id: "univ-usp", name: "Universidade de São Paulo", shortLabel: "USP" },
-    { id: "univ-uni", name: "UNICAMP", shortLabel: "UNICAMP" },
-    { id: "univ-ufm", name: "UFMG", shortLabel: "UFMG" },
+    { id: "11111111-1111-4111-8111-111111111111", name: "Universidade de São Paulo", shortLabel: "USP" },
+    { id: "22222222-2222-4222-8222-222222222222", name: "UNICAMP", shortLabel: "UNICAMP" },
+    { id: "33333333-3333-4333-8333-333333333333", name: "UFMG", shortLabel: "UFMG" },
 ];
 
 const MOCK_COURSES_BY_UNIVERSITY: Record<string, Course[]> = {
-    "univ-usp": [
+    "11111111-1111-4111-8111-111111111111": [
         { id: "6ba7b810-9dad-11d1-80b4-00c04fd430c1", shortLabel: "EDA", name: "Estruturas de Dados Avançadas", teacher: "Dr. Sterling",  location: "Bloco de Engenharia, 402", schedules: [] },
         { id: "6ba7b811-9dad-11d1-80b4-00c04fd430c2", shortLabel: "SO",  name: "Sistemas Operacionais",        teacher: "Dr. Khan",      location: "Laboratório 304",           schedules: [] },
         { id: "6ba7b813-9dad-11d1-80b4-00c04fd430c4", shortLabel: "LP",  name: "Linguagens de Programação",   teacher: "Dr. Hayashi",   location: "Sala 201",                  schedules: [] },
         { id: "6ba7b814-9dad-11d1-80b4-00c04fd430c5", shortLabel: "BD",  name: "Banco de Dados",              teacher: "Prof. Santos",  location: "Laboratório 105",           schedules: [] },
     ],
-    "univ-uni": [
+    "22222222-2222-4222-8222-222222222222": [
         { id: "6ba7b812-9dad-11d1-80b4-00c04fd430c3", shortLabel: "PSI", name: "Psicologia de UI/UX",         teacher: "Prof. Miller",  location: "Lab. de Design B",          schedules: [] },
         { id: "6ba7b813-9dad-11d1-80b4-00c04fd430c4", shortLabel: "LP",  name: "Linguagens de Programação",   teacher: "Dr. Hayashi",   location: "Sala 201",                  schedules: [] },
         { id: "6ba7b814-9dad-11d1-80b4-00c04fd430c5", shortLabel: "BD",  name: "Banco de Dados",              teacher: "Prof. Santos",  location: "Laboratório 105",           schedules: [] },
     ],
-    "univ-ufm": [
+    "33333333-3333-4333-8333-333333333333": [
         { id: "6ba7b810-9dad-11d1-80b4-00c04fd430c1", shortLabel: "EDA", name: "Estruturas de Dados Avançadas", teacher: "Dr. Sterling", location: "Bloco de Engenharia, 402",  schedules: [] },
         { id: "6ba7b812-9dad-11d1-80b4-00c04fd430c3", shortLabel: "PSI", name: "Psicologia de UI/UX",           teacher: "Prof. Miller", location: "Lab. de Design B",          schedules: [] },
         { id: "6ba7b811-9dad-11d1-80b4-00c04fd430c2", shortLabel: "SO",  name: "Sistemas Operacionais",         teacher: "Dr. Khan",     location: "Laboratório 304",           schedules: [] },

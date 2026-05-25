@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import HomeScreen from "../screens/HomeScreen";
 import ScheduleScreen from "../screens/ScheduleScreen";
+import GroupsScreen from "../screens/GroupsScreen";
 import { AppStackParamList, MainTabsParamList } from "../types";
 import CheckInNavigator from "./CheckInNavigator";
 
@@ -22,7 +23,24 @@ function MainTabs() {
           ),
         }}
       />
-      <Tab.Screen name="Schedule" component={ScheduleScreen} />
+      {/* <Tab.Screen
+        name="Schedule"
+        component={ScheduleScreen}
+        options={{
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? "calendar" : "calendar-outline"} size={size} color={color} />
+          ),
+        }}
+      /> */}
+      <Tab.Screen
+        name="Groups"
+        component={GroupsScreen}
+        options={{
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? "people" : "people-outline"} size={size} color={color} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }

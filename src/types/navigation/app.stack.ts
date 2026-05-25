@@ -5,6 +5,7 @@ import type { CheckInStackParamList } from "./check-in.stack";
 export type MainTabsParamList = {
     Home: undefined;
     Schedule: undefined;
+    Groups: undefined;
 };
 
 export type AppStackParamList = {

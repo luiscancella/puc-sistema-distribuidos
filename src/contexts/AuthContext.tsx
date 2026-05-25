@@ -12,15 +12,16 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<AuthSession | null>({
-    token: "dummy-token",
-    student: {
-      id: "00000000-0000-4000-a000-000000000001",
-      name: "Usuário",
-      email: "user@email.com",
-      groupId: "00000000-0000-4000-a000-000000000001",
-    },
-  });
+  // const [session, setSession] = useState<AuthSession | null>({
+  //   token: "dummy-token",
+  //   student: {
+  //     id: "00000000-0000-4000-a000-000000000001",
+  //     name: "Usuário",
+  //     email: "user@email.com",
+  //     groupId: "00000000-0000-4000-a000-000000000001",
+  //   },
+  // });
+  const [session, setSession] = useState<AuthSession | null>(null);
 
   const signIn = async (data: SignInData) => {
     // TODO: Implement sign-in logic here

@@ -1,10 +1,23 @@
 import { z } from "zod";
 import { CourseSchema } from "../courses/course.schema";
+import { StudentSchema } from "../users/user.schema";
+
+export const GroupMemberSchema = z.object({
+    student: StudentSchema,
+    points: z.number().int(),
+    isCurrentUser: z.boolean(),
+});
+export type GroupMember = z.infer<typeof GroupMemberSchema>;
 
 export const GroupSchema = z.object({
     id: z.uuid(),
     name: z.string(),
+    memberCount: z.number().int(),
+    memberLimit: z.number().int(),
+    inviteCode: z.string(),
+    weeklyCheckIns: z.number().int(),
     courses: z.array(CourseSchema),
+    members: z.array(GroupMemberSchema),
 });
 export type Group = z.infer<typeof GroupSchema>;
 

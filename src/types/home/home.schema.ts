@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { StudentSchema } from "../users/user.schema";
+import { GroupSchema } from "../groups/group.schema";
 
 export const StreakDataSchema = z.object({
     currentStreak: z.number().int().positive(),
@@ -16,17 +16,9 @@ export const CheckInStatusSchema = z.object({
 });
 export type CheckInStatus = z.infer<typeof CheckInStatusSchema>;
 
-export const SquadRankingEntrySchema = z.object({
-    rank: z.number().int().positive(),
-    student: StudentSchema,
-    points: z.number().int(),
-    isCurrentUser: z.boolean(),
-});
-export type SquadRankingEntry = z.infer<typeof SquadRankingEntrySchema>;
-
 export const HomeScreenDataSchema = z.object({
     streak: StreakDataSchema,
     checkIn: CheckInStatusSchema,
-    squadRanking: z.array(SquadRankingEntrySchema).max(3),
+    group: GroupSchema,
 });
 export type HomeScreenData = z.infer<typeof HomeScreenDataSchema>;
