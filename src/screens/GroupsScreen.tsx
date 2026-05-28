@@ -33,6 +33,7 @@ const getInitials = (name: string): string =>
 const MOCK_DATA: Group = {
     id: "00000000-0000-4000-a000-000000000010",
     name: "Design '26",
+    university: { id: "00000000-0000-4000-a000-000000000020", name: "Universidade Federal", shortLabel: "UFMG" },
     memberCount: 6,
     memberLimit: 12,
     inviteCode: "D26-PULL",

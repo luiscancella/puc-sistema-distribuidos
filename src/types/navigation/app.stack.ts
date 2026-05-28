@@ -6,6 +6,7 @@ export type MainTabsParamList = {
     Home: undefined;
     Schedule: undefined;
     Groups: undefined;
+    Me: undefined;
 };
 
 export type AppStackParamList = {

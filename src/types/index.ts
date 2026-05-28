@@ -14,6 +14,8 @@ export * from "./university/university.schema";
 
 export * from "./users/user.schema";
 
+export * from "./profile/profile.schema";
+
 export * from "./navigation/onboarding.stack";
 
 export * from "./navigation/group-setup.stack";

@@ -3,8 +3,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 
 import HomeScreen from "../screens/HomeScreen";
-import ScheduleScreen from "../screens/ScheduleScreen";
 import GroupsScreen from "../screens/GroupsScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 import { AppStackParamList, MainTabsParamList } from "../types";
 import CheckInNavigator from "./CheckInNavigator";
 
@@ -38,6 +38,16 @@ function MainTabs() {
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons name={focused ? "people" : "people-outline"} size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Me"
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: "Me",
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? "person" : "person-outline"} size={size} color={color} />
           ),
         }}
       />
