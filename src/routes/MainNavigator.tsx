@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/HomeScreen";
 import GroupsScreen from "../screens/GroupsScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 import { AppStackParamList, MainTabsParamList } from "../types";
 import CheckInNavigator from "./CheckInNavigator";
 
@@ -60,6 +61,7 @@ export default function MainNavigator() {
     <MainStack.Navigator initialRouteName="Main" screenOptions={{ headerShown: false }}>
       <MainStack.Screen name="Main" component={MainTabs} />
       <MainStack.Screen name="CheckIn" component={CheckInNavigator} />
+      <MainStack.Screen name="Settings" component={SettingsScreen} />
     </MainStack.Navigator>
   );
 }

@@ -9,10 +9,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Colors, FontFamily, Radius, Shadow } from "../constants/brand";
-import { ProfileScreenData } from "../types";
+import { AppStackParamList, ProfileScreenData } from "../types";
 import { useAuth } from "../contexts/AuthContext";
+
+type ProfileNav = NativeStackNavigationProp<AppStackParamList>;
 
 const getInitials = (name: string): string =>
 	name
@@ -47,6 +51,7 @@ const buildMock = (studentName: string): ProfileScreenData => ({
 type UIState = "loading" | "error" | "success";
 
 export default function ProfileScreen() {
+	const navigation = useNavigation<ProfileNav>();
 	const { session, signOut } = useAuth();
 	const student = session!.student;
 
@@ -107,6 +112,7 @@ export default function ProfileScreen() {
 				<View style={styles.topBar}>
 					<View />
 					<Pressable
+						onPress={() => navigation.navigate("Settings")}
 						style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
 					>
 						<Ionicons name="settings-outline" size={22} color={Colors.ink} />

@@ -12,4 +12,5 @@ export type MainTabsParamList = {
 export type AppStackParamList = {
     Main: NavigatorScreenParams<MainTabsParamList> | undefined;
     CheckIn: NavigatorScreenParams<CheckInStackParamList> | undefined;
+    Settings: undefined;
 };
