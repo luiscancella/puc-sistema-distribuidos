@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
+import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -29,6 +30,7 @@ const DARK_PILL = "rgba(31,26,46,0.60)";
 export default function CameraScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<CheckInStackParamList>>();
     const [permission, requestPermission] = useCameraPermissions();
+    const [locationPermission, requestLocationPermission] = Location.useForegroundPermissions();
 
     const [facing, setFacing] = useState<CameraType>("front");
     const [flash, setFlash] = useState(false);
@@ -54,11 +56,16 @@ export default function CameraScreen() {
     async function capture() {
         animateShutter();
         try {
-            const result = await cameraRef.current?.takePictureAsync({ quality: 0.8 });
-            if (!result?.uri) throw new Error();
+            const [photo, location] = await Promise.all([
+                cameraRef.current?.takePictureAsync({ quality: 0.8 }),
+                Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High }),
+            ]);
+            if (!photo?.uri) throw new Error();
             navigation.navigate("Confirm", {
-                photoUri: result.uri,
+                photoUri: photo.uri,
                 courseName: MOCK_CLASS.courseName,
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
             });
         } catch {
             setError("Não foi possível tirar a foto. Tente novamente.");
@@ -92,7 +99,7 @@ export default function CameraScreen() {
         setTimerSeconds(TIMER_CYCLE[next]);
     }
 
-    if (!permission) {
+    if (!permission || !locationPermission) {
         return (
             <View style={styles.center}>
                 <ActivityIndicator color={Colors.peach} size="large" />
@@ -113,6 +120,28 @@ export default function CameraScreen() {
                     </View>
                     <Pressable
                         onPress={requestPermission}
+                        style={({ pressed }) => [styles.primaryBtn, pressed && styles.btnPressed]}
+                    >
+                        <Text style={styles.primaryBtnText}>Permitir acesso</Text>
+                    </Pressable>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    if (!locationPermission.granted) {
+        return (
+            <SafeAreaView style={styles.center}>
+                <View style={styles.permissionCard}>
+                    <LogoMark size={52} />
+                    <View style={styles.permissionText}>
+                        <Text style={styles.permissionTitle}>Precisamos da sua localização.</Text>
+                        <Text style={styles.permissionBody}>
+                            O check-in só vale se você estiver na sala de aula. Precisamos confirmar onde você está.
+                        </Text>
+                    </View>
+                    <Pressable
+                        onPress={requestLocationPermission}
                         style={({ pressed }) => [styles.primaryBtn, pressed && styles.btnPressed]}
                     >
                         <Text style={styles.primaryBtnText}>Permitir acesso</Text>

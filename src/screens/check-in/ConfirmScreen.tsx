@@ -23,7 +23,7 @@ const DARK_PILL = "rgba(31,26,46,0.60)";
 
 export default function ConfirmScreen() {
     const navigation = useNavigation<ConfirmNav>();
-    const { photoUri, courseName } = useRoute<ConfirmRoute>().params;
+    const { photoUri, courseName, latitude, longitude } = useRoute<ConfirmRoute>().params;
 
     const [submitting, setSubmitting] = useState(false);
 
