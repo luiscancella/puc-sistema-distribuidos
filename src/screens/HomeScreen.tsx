@@ -14,62 +14,33 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Colors, FontFamily, Radius, Shadow } from "../constants/brand";
-import {
-	AppStackParamList,
-	MainTabsParamList,
-	HomeScreenData,
-} from "../types";
+import { AppStackParamList, MainTabsParamList, HomeScreenData } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import { getHome } from "../services/home";
+import { AVATAR_COLORS, getInitials } from "../utils/avatar";
+import {
+	WEEKDAY_SHORT,
+	getNextOccurrences,
+	formatTimeRange,
+	formatDeadline,
+	formatDateLabel,
+} from "../utils/schedule";
 
 type HomeNav = CompositeNavigationProp<
 	BottomTabNavigationProp<MainTabsParamList, "Home">,
 	NativeStackNavigationProp<AppStackParamList>
 >;
 
-// ── Avatar color rotation ───────────────────────────────────────────────────
-
-const AVATAR_COLORS = [
-	Colors.peach,
-	Colors.mint,
-	Colors.lav,
-	Colors.sky,
-	Colors.gold,
-	Colors.rose,
+const UPCOMING_CARD_COLORS = [
+	Colors.peachSoft,
+	Colors.mintSoft,
+	Colors.lavSoft,
+	Colors.skySoft,
+	Colors.goldSoft,
+	Colors.roseSoft,
 ] as const;
 
-const getInitials = (name: string): string => {
-	return name
-		.split(" ")
-		.map((w) => w[0])
-		.join("")
-		.slice(0, 2)
-		.toUpperCase();
-}
-
-// ── Constants ────────────────────────────────────────────────────────────────
-
 const MEDALS: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
-
-function formatDeadline(isoDatetime: string): string {
-	const date = new Date(isoDatetime);
-	const time = date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-	return `Não quebre agora. Faça o check-in antes das ${time}.`;
-}
-
-function formatDateLabel(isoDate: string): string {
-	const [year, month, day] = isoDate.split("-").map(Number);
-	const date = new Date(year, month - 1, day);
-	const weekday = date
-		.toLocaleDateString("pt-BR", { weekday: "short" })
-		.toUpperCase()
-		.replace(/[.]/g, "");
-	const monthStr = date
-		.toLocaleDateString("pt-BR", { month: "short" })
-		.toUpperCase()
-		.replace(/[.]/g, "");
-	return `${weekday} ${monthStr} ${String(day).padStart(2, "0")}`;
-}
 
 type UIState = "loading" | "error" | "success";
 
@@ -82,8 +53,8 @@ export default function HomeScreen() {
 	const [uiState, setUiState] = useState<UIState>("loading");
 	const [data, setData] = useState<HomeScreenData | null>(null);
 
-	let avatarColorIndex = 0;
-	const nextAvatarColor = () => AVATAR_COLORS[avatarColorIndex++ % AVATAR_COLORS.length];
+	const occurrences = data?.group ? getNextOccurrences(data.group.courses, new Date()) : [];
+	const nextOccurrence = occurrences[0] ?? null;
 
 	const load = async () => {
 		setUiState("loading");
@@ -99,21 +70,19 @@ export default function HomeScreen() {
 	};
 
 	useEffect(() => {
-		load()
+		load();
 	}, []);
 
 	const handleCheckIn = () => navigation.navigate("CheckIn", { screen: "Camera" });
 
-	// Loading
 	if (uiState === "loading") {
 		return (
 			<SafeAreaView style={styles.centeredRoot} edges={["top", "bottom"]}>
 				<ActivityIndicator color={Colors.peach} size="large" style={styles.shimSpinner} />
 			</SafeAreaView>
-		)
-	};
+		);
+	}
 
-	// Error
 	if (uiState === "error") {
 		return (
 			<SafeAreaView style={styles.centeredRoot} edges={["top", "bottom"]}>
@@ -132,7 +101,9 @@ export default function HomeScreen() {
 				</View>
 			</SafeAreaView>
 		);
-	};
+	}
+
+	const { streak, checkIn, group } = data!;
 
 	return (
 		<SafeAreaView style={styles.root} edges={["top", "bottom"]}>
@@ -145,7 +116,7 @@ export default function HomeScreen() {
 						<View
 							style={[
 								styles.avatar,
-								{ backgroundColor: nextAvatarColor() },
+								{ backgroundColor: AVATAR_COLORS[0] },
 							]}
 						>
 							<Text style={styles.avatarText}>{initials}</Text>
@@ -167,41 +138,98 @@ export default function HomeScreen() {
 					</Pressable>
 				</View>
 
-				{
-					data && data.streak.currentStreak > 0 &&
+				{streak.currentStreak > 0 && (
 					<View style={styles.streakCard}>
-					<View style={styles.streakHeader}>
-						<View style={styles.streakIconWrap}>
-							<Ionicons name="flame" size={22} color={Colors.surface} />
-						</View>
-						<View style={styles.streakTextCol}>
-							<Text style={styles.streakTitle}>
-								{data!.streak.currentStreak} dias de sequência
-							</Text>
-							<Text style={styles.streakSubtitle}>
-								{formatDeadline(data!.streak.deadlineLabel)}
-							</Text>
+						<View style={styles.streakHeader}>
+							<View style={styles.streakIconWrap}>
+								<Ionicons name="flame" size={22} color={Colors.surface} />
+							</View>
+							<View style={styles.streakTextCol}>
+								<Text style={styles.streakTitle}>
+									{streak.currentStreak} dias de sequência
+								</Text>
+								<Text style={styles.streakSubtitle}>
+									{formatDeadline(streak.deadlineLabel)}
+								</Text>
+							</View>
 						</View>
 					</View>
-				</View>
-				}
-				
+				)}
+
+				{occurrences.length > 0 && (
+					<View style={styles.upcomingSection}>
+						<Text style={styles.upcomingTitle}>Próximas aulas</Text>
+						<ScrollView
+							horizontal
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={styles.upcomingScroll}
+						>
+							{occurrences.slice(0, 8).map((occ, index) => (
+								<View
+									key={occ.schedule.id}
+									style={[
+										styles.upcomingCard,
+										{ backgroundColor: UPCOMING_CARD_COLORS[index % UPCOMING_CARD_COLORS.length] },
+									]}
+								>
+									<Text style={styles.upcomingDay}>
+										{WEEKDAY_SHORT[occ.schedule.day]}
+									</Text>
+									<Text style={styles.upcomingTime}>
+										{formatTimeRange(occ.nextDate, occ.nextEndDate)}
+									</Text>
+									<Text style={styles.upcomingCourseName} numberOfLines={1}>
+										{occ.course.name}
+									</Text>
+									<Text style={styles.upcomingMeta} numberOfLines={1}>
+										{occ.course.teacher} · {occ.course.location}
+									</Text>
+								</View>
+							))}
+						</ScrollView>
+					</View>
+				)}
 
 				<View style={styles.checkInCard}>
 					<Text style={styles.checkInDate}>
-						{formatDateLabel(data!.checkIn.dateLabel)}
+						{formatDateLabel(checkIn.dateLabel)}
 					</Text>
-					<Text style={styles.checkInHeading}>Tudo pronto quando você estiver.</Text>
+					<Text style={styles.checkInHeading}>
+						{nextOccurrence
+							? `Próxima aula: ${nextOccurrence.course.name}`
+							: "Tudo pronto quando você estiver."}
+					</Text>
+					{nextOccurrence && (
+						<Text style={styles.checkInSubtext}>
+							{formatTimeRange(nextOccurrence.nextDate, nextOccurrence.nextEndDate)}{" "}
+							· {nextOccurrence.course.location}
+						</Text>
+					)}
 					<Pressable
-						onPress={handleCheckIn}
+						onPress={
+							nextOccurrence && !checkIn.checkedInToday ? handleCheckIn : undefined
+						}
+						disabled={!nextOccurrence || checkIn.checkedInToday}
 						style={({ pressed }) => [
 							styles.checkInBtn,
-							pressed && styles.checkInBtnPressed,
+							(!nextOccurrence || checkIn.checkedInToday) && styles.checkInBtnDisabled,
+							pressed &&
+								!!nextOccurrence &&
+								!checkIn.checkedInToday &&
+								styles.checkInBtnPressed,
 						]}
 					>
-						<Ionicons name="camera-outline" size={20} color={Colors.surface} />
+						<Ionicons
+							name={checkIn.checkedInToday ? "checkmark-circle-outline" : "camera-outline"}
+							size={20}
+							color={Colors.surface}
+						/>
 						<Text style={styles.checkInBtnText}>
-							Check-in | +{data!.checkIn.pointReward} pontos
+							{checkIn.checkedInToday
+								? "Check-in já feito hoje"
+								: nextOccurrence
+									? `Check-in | +${checkIn.pointReward} pontos`
+									: "Sem aulas marcadas"}
 						</Text>
 					</Pressable>
 				</View>
@@ -214,7 +242,7 @@ export default function HomeScreen() {
 						</Pressable>
 					</View>
 					<View style={styles.squadList}>
-						{(data!.group?.members ?? []).slice(0, 3).map((entry, index) => {
+						{(group?.members ?? []).slice(0, 3).map((entry, index) => {
 							const rank = index + 1;
 							const entryInitials = getInitials(entry.student.name);
 							return (
@@ -231,7 +259,7 @@ export default function HomeScreen() {
 									<View
 										style={[
 											styles.rankAvatar,
-											{ backgroundColor: nextAvatarColor() },
+											{ backgroundColor: AVATAR_COLORS[index % AVATAR_COLORS.length] },
 										]}
 									>
 										<Text style={styles.rankAvatarText}>{entryInitials}</Text>
@@ -399,6 +427,49 @@ const styles = StyleSheet.create({
 		fontSize: 13,
 		color: Colors.ink2,
 	},
+	upcomingSection: {
+		gap: 12,
+	},
+	upcomingTitle: {
+		fontFamily: FontFamily.display,
+		fontSize: 20,
+		color: Colors.ink,
+		letterSpacing: -0.4,
+	},
+	upcomingScroll: {
+		gap: 12,
+		paddingRight: 8,
+	},
+	upcomingCard: {
+		width: 160,
+		borderRadius: Radius.tile,
+		padding: 14,
+		gap: 4,
+		...Shadow.e1,
+	},
+	upcomingDay: {
+		fontFamily: FontFamily.bodyBold,
+		fontSize: 11,
+		letterSpacing: 1,
+		textTransform: "uppercase",
+		color: Colors.ink2,
+	},
+	upcomingTime: {
+		fontFamily: FontFamily.display,
+		fontSize: 20,
+		color: Colors.ink,
+		letterSpacing: -0.4,
+	},
+	upcomingCourseName: {
+		fontFamily: FontFamily.bodyBold,
+		fontSize: 14,
+		color: Colors.ink,
+	},
+	upcomingMeta: {
+		fontFamily: FontFamily.body,
+		fontSize: 12,
+		color: Colors.ink2,
+	},
 	checkInCard: {
 		borderRadius: Radius.card,
 		backgroundColor: Colors.surface,
@@ -420,6 +491,11 @@ const styles = StyleSheet.create({
 		letterSpacing: -0.8,
 		color: Colors.ink,
 	},
+	checkInSubtext: {
+		fontFamily: FontFamily.body,
+		fontSize: 14,
+		color: Colors.ink2,
+	},
 	checkInBtn: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -434,13 +510,16 @@ const styles = StyleSheet.create({
 		transform: [{ scale: 0.97 }],
 		opacity: 0.92,
 	},
+	checkInBtnDisabled: {
+		backgroundColor: Colors.surface2,
+		opacity: 0.6,
+	},
 	checkInBtnText: {
 		fontFamily: FontFamily.bodyBold,
 		fontSize: 16,
 		color: Colors.surface,
 	},
 
-	// ── Squad section
 	squadSection: {
 		gap: 12,
 	},

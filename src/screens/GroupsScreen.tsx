@@ -14,23 +14,7 @@ import { Colors, FontFamily, Radius, Shadow } from "../constants/brand";
 import { Group } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import { getGroup } from "../services/groups";
-
-const AVATAR_COLORS = [
-    Colors.lav,
-    Colors.mint,
-    Colors.sky,
-    Colors.gold,
-    Colors.peach,
-    Colors.rose,
-] as const;
-
-const getInitials = (name: string): string =>
-    name
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase();
+import { AVATAR_COLORS, getInitials } from "../utils/avatar";
 
 type UIState = "loading" | "error" | "success";
 
@@ -84,12 +68,7 @@ export default function GroupsScreen() {
     }
 
     const group = data!;
-    const groupInitials = group.name
-        .split(/\s+/)
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase();
+    const groupInitials = getInitials(group.name);
 
     return (
         <SafeAreaView style={styles.root} edges={["top", "bottom"]}>
