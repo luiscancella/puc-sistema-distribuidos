@@ -5,7 +5,7 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -14,6 +14,7 @@ import { AppStackParamList, CheckInStackParamList } from "../../types";
 
 export default function SuccessScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<CheckInStackParamList>>();
+    const { pointsEarned, streakCount } = useRoute<RouteProp<CheckInStackParamList, "Success">>().params;
 
     return (
         <SafeAreaView style={styles.root} edges={["top", "bottom"]}>
@@ -30,11 +31,11 @@ export default function SuccessScreen() {
                 <View style={styles.cardsRow}>
                     <View style={styles.card}>
                         <Text style={styles.cardLabel}>Pontos</Text>
-                        <Text style={styles.cardValuePeach}>+12</Text>
+                        <Text style={styles.cardValuePeach}>+{pointsEarned}</Text>
                     </View>
                     <View style={styles.card}>
                         <Text style={styles.cardLabel}>Sequência</Text>
-                        <Text style={styles.cardValueInk}>🔥 8</Text>
+                        <Text style={styles.cardValueInk}>🔥 {streakCount}</Text>
                     </View>
                 </View>
             </View>

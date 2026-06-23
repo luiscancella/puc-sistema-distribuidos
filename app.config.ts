@@ -29,6 +29,7 @@ export default {
     },
     "plugins": [
       "expo-font",
+      "expo-secure-store",
       [
         "expo-camera",
         {
@@ -40,6 +41,7 @@ export default {
       ]
     ],
     "extra": {
+      "apiUrl": process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000",
       "eas": {
         "projectId": "fbbdd396-118d-48d8-ae2c-7c35da802682"
       }

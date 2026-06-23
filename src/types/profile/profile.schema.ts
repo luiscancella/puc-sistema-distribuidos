@@ -12,7 +12,7 @@ export type StudentStats = z.infer<typeof StudentStatsSchema>;
 
 export const ProfileScreenDataSchema = z.object({
     student:        StudentSchema,
-    universityName: z.string(),
+    universityName: z.string().nullable(),
     stats:          StudentStatsSchema,
 });
 export type ProfileScreenData = z.infer<typeof ProfileScreenDataSchema>;

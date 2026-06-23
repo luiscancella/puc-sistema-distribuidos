@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Modal,
@@ -25,33 +25,8 @@ import {
     University,
 } from "../../types";
 import { Ionicons } from "@expo/vector-icons";
-
-const MOCK_UNIVERSITIES: University[] = [
-    { id: "11111111-1111-4111-8111-111111111111", name: "Universidade de São Paulo", shortLabel: "USP" },
-    { id: "22222222-2222-4222-8222-222222222222", name: "UNICAMP", shortLabel: "UNICAMP" },
-    { id: "33333333-3333-4333-8333-333333333333", name: "UFMG", shortLabel: "UFMG" },
-];
-
-const MOCK_COURSES_BY_UNIVERSITY: Record<string, Course[]> = {
-    "11111111-1111-4111-8111-111111111111": [
-        { id: "6ba7b810-9dad-11d1-80b4-00c04fd430c1", shortLabel: "EDA", name: "Estruturas de Dados Avançadas", teacher: "Dr. Sterling",  location: "Bloco de Engenharia, 402", schedules: [] },
-        { id: "6ba7b811-9dad-11d1-80b4-00c04fd430c2", shortLabel: "SO",  name: "Sistemas Operacionais",        teacher: "Dr. Khan",      location: "Laboratório 304",           schedules: [] },
-        { id: "6ba7b813-9dad-11d1-80b4-00c04fd430c4", shortLabel: "LP",  name: "Linguagens de Programação",   teacher: "Dr. Hayashi",   location: "Sala 201",                  schedules: [] },
-        { id: "6ba7b814-9dad-11d1-80b4-00c04fd430c5", shortLabel: "BD",  name: "Banco de Dados",              teacher: "Prof. Santos",  location: "Laboratório 105",           schedules: [] },
-    ],
-    "22222222-2222-4222-8222-222222222222": [
-        { id: "6ba7b812-9dad-11d1-80b4-00c04fd430c3", shortLabel: "PSI", name: "Psicologia de UI/UX",         teacher: "Prof. Miller",  location: "Lab. de Design B",          schedules: [] },
-        { id: "6ba7b813-9dad-11d1-80b4-00c04fd430c4", shortLabel: "LP",  name: "Linguagens de Programação",   teacher: "Dr. Hayashi",   location: "Sala 201",                  schedules: [] },
-        { id: "6ba7b814-9dad-11d1-80b4-00c04fd430c5", shortLabel: "BD",  name: "Banco de Dados",              teacher: "Prof. Santos",  location: "Laboratório 105",           schedules: [] },
-    ],
-    "33333333-3333-4333-8333-333333333333": [
-        { id: "6ba7b810-9dad-11d1-80b4-00c04fd430c1", shortLabel: "EDA", name: "Estruturas de Dados Avançadas", teacher: "Dr. Sterling", location: "Bloco de Engenharia, 402",  schedules: [] },
-        { id: "6ba7b812-9dad-11d1-80b4-00c04fd430c3", shortLabel: "PSI", name: "Psicologia de UI/UX",           teacher: "Prof. Miller", location: "Lab. de Design B",          schedules: [] },
-        { id: "6ba7b811-9dad-11d1-80b4-00c04fd430c2", shortLabel: "SO",  name: "Sistemas Operacionais",         teacher: "Dr. Khan",     location: "Laboratório 304",           schedules: [] },
-    ],
-};
-
-const MOCK_GROUP_ID = "00000000-0000-4000-b000-000000000002";
+import { createGroup } from "../../services/groups";
+import { listUniversities, listCourses } from "../../services/universities";
 
 export default function CreateGroupScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<GroupSetupStackParamList>>();
@@ -62,26 +37,33 @@ export default function CreateGroupScreen() {
         defaultValues: { courseIds: [] },
     });
 
+    const [universities, setUniversities] = useState<University[]>([]);
     const [step, setStep] = useState<1 | 2>(1);
     const [selectedUniversity, setSelectedUniversity] = useState<University | null>(null);
     const [focusedName, setFocusedName] = useState(false);
+    const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [globalError, setGlobalError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const availableCourses = selectedUniversity
-        ? (MOCK_COURSES_BY_UNIVERSITY[selectedUniversity.id] ?? [])
-        : [];
+    useEffect(() => {
+        listUniversities().then(setUniversities).catch(() => setGlobalError("Não foi possível carregar as faculdades."));
+    }, []);
 
     const selectedCourses = availableCourses.filter((c) => selectedIds.includes(c.id));
 
-    const handleSelectUniversity = (university: University) => {
+    const handleSelectUniversity = async (university: University) => {
         setSelectedUniversity(university);
         setSelectedIds([]);
         setValue("universityId", university.id, { shouldValidate: true });
         setValue("courseIds", [], { shouldValidate: false });
         setStep(2);
+        try {
+            setAvailableCourses(await listCourses(university.id));
+        } catch {
+            setGlobalError("Não foi possível carregar as matérias.");
+        }
     };
 
     const toggleCourse = (id: string) => {
@@ -92,12 +74,12 @@ export default function CreateGroupScreen() {
         setValue("courseIds", next, { shouldValidate: true });
     };
 
-    const onSubmit = async (_data: CreateGroupData) => {
+    const onSubmit = async (data: CreateGroupData) => {
         setGlobalError(null);
         setLoading(true);
         try {
-            // TODO: call backend to create group, get real groupId
-            await assignGroup(MOCK_GROUP_ID);
+            const { groupId } = await createGroup(data);
+            await assignGroup(groupId);
         } catch {
             setGlobalError("Não foi possível criar o grupo. Tente novamente.");
         } finally {
@@ -136,7 +118,7 @@ export default function CreateGroupScreen() {
                         </View>
 
                         <View style={styles.universityList}>
-                            {MOCK_UNIVERSITIES.map((univ) => (
+                            {universities.map((univ) => (
                                 <Pressable
                                     key={univ.id}
                                     onPress={() => handleSelectUniversity(univ)}

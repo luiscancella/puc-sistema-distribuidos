@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { Colors, FontFamily, Radius, Shadow } from "../../constants/brand";
 import { CheckInStackParamList } from "../../types";
+import { submitCheckIn, TooFarError } from "../../services/checkins";
 
 type ConfirmNav = NativeStackNavigationProp<CheckInStackParamList, "Confirm">;
 type ConfirmRoute = RouteProp<CheckInStackParamList, "Confirm">;
@@ -23,15 +24,31 @@ const DARK_PILL = "rgba(31,26,46,0.60)";
 
 export default function ConfirmScreen() {
     const navigation = useNavigation<ConfirmNav>();
-    const { photoUri, courseName, latitude, longitude } = useRoute<ConfirmRoute>().params;
+    const { photoUri, courseName, classSessionId, latitude, longitude } = useRoute<ConfirmRoute>().params;
 
     const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     async function handleConfirm() {
         setSubmitting(true);
-        // TODO: send to backend
-        await new Promise(r => setTimeout(r, 1500));
-        navigation.navigate("Success");
+        setError(null);
+        try {
+            const result = await submitCheckIn({ classSessionId, photoUri, latitude, longitude });
+            navigation.navigate("Success", {
+                pointsEarned: result.pointsEarned,
+                streakCount: result.streakCount,
+            });
+        } catch (err) {
+            if (err instanceof TooFarError) {
+                setError(`Você está a ${Math.round(err.distanceMeters)}m da sala. Aproxime-se para fazer o check-in.`);
+            } else if (err instanceof Error && err.message === "ALREADY_CHECKED_IN") {
+                setError("Você já fez check-in nesta aula.");
+            } else {
+                setError("Não foi possível registrar sua presença. Tente novamente.");
+            }
+        } finally {
+            setSubmitting(false);
+        }
     }
 
     return (
@@ -52,6 +69,12 @@ export default function ConfirmScreen() {
                 <Text style={styles.title}>Ficou ótima.</Text>
                 <Text style={styles.subtitle}>Confirme para registrar sua presença.</Text>
             </View>
+
+            {error && (
+                <View style={styles.errorBanner}>
+                    <Text style={styles.errorBannerText}>{error}</Text>
+                </View>
+            )}
 
             {/* Buttons */}
             <View style={styles.footer}>
@@ -137,6 +160,20 @@ const styles = StyleSheet.create({
         fontSize: 15,
         lineHeight: 22,
         color: Colors.ink2,
+    },
+
+    // ── Error banner ──────────────────────────────────────────────────
+    errorBanner: {
+        backgroundColor: "rgba(224,90,58,0.12)",
+        borderRadius: Radius.tile,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+    },
+    errorBannerText: {
+        fontFamily: FontFamily.body,
+        fontSize: 14,
+        color: "#E05A3A",
+        textAlign: "center",
     },
 
     // ── Footer ────────────────────────────────────────────────────────

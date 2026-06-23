@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Colors, FontFamily, Radius, Shadow } from "../constants/brand";
 import { AppStackParamList, ProfileScreenData } from "../types";
 import { useAuth } from "../contexts/AuthContext";
+import { getProfile } from "../services/profile";
 
 type ProfileNav = NativeStackNavigationProp<AppStackParamList>;
 
@@ -31,23 +32,6 @@ function formatPoints(points: number): string {
 	return points.toLocaleString("pt-BR");
 }
 
-const buildMock = (studentName: string): ProfileScreenData => ({
-	student: {
-		id: "00000000-0000-4000-a000-000000000001",
-		name: studentName,
-		email: "user@puc.edu",
-		groupId: "00000000-0000-4000-a000-000000000010",
-	},
-	universityName: "Universidade Federal",
-	stats: {
-		checkIns: 142,
-		currentStreak: 7,
-		bestStreak: 23,
-		points: 1700,
-		rank: 2,
-	},
-});
-
 type UIState = "loading" | "error" | "success";
 
 export default function ProfileScreen() {
@@ -62,8 +46,7 @@ export default function ProfileScreen() {
 		setUiState("loading");
 		setData(null);
 		try {
-			await new Promise((r) => setTimeout(r, 800));
-			setData(buildMock(student.name));
+			setData(await getProfile());
 			setUiState("success");
 		} catch {
 			setUiState("error");

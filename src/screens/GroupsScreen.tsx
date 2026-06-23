@@ -12,6 +12,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { Colors, FontFamily, Radius, Shadow } from "../constants/brand";
 import { Group } from "../types";
+import { useAuth } from "../contexts/AuthContext";
+import { getGroup } from "../services/groups";
 
 const AVATAR_COLORS = [
     Colors.lav,
@@ -30,52 +32,10 @@ const getInitials = (name: string): string =>
         .slice(0, 2)
         .toUpperCase();
 
-const MOCK_DATA: Group = {
-    id: "00000000-0000-4000-a000-000000000010",
-    name: "Design '26",
-    university: { id: "00000000-0000-4000-a000-000000000020", name: "Universidade Federal", shortLabel: "UFMG" },
-    memberCount: 6,
-    memberLimit: 12,
-    inviteCode: "D26-PULL",
-    weeklyCheckIns: 32,
-    courses: [],
-    members: [
-        {
-            student: { id: "00000000-0000-4000-a000-000000000002", name: "Maya R.", email: "maya@puc.edu" },
-            points: 1840,
-            isCurrentUser: false,
-        },
-        {
-            student: { id: "00000000-0000-4000-a000-000000000001", name: "Você", email: "user@puc.edu" },
-            points: 1720,
-            isCurrentUser: true,
-        },
-        {
-            student: { id: "00000000-0000-4000-a000-000000000003", name: "Theo K.", email: "theo@puc.edu" },
-            points: 1605,
-            isCurrentUser: false,
-        },
-        {
-            student: { id: "00000000-0000-4000-a000-000000000004", name: "Bruno P.", email: "bruno@puc.edu" },
-            points: 1322,
-            isCurrentUser: false,
-        },
-        {
-            student: { id: "00000000-0000-4000-a000-000000000005", name: "Sara M.", email: "sara@puc.edu" },
-            points: 1280,
-            isCurrentUser: false,
-        },
-        {
-            student: { id: "00000000-0000-4000-a000-000000000006", name: "Lucas C.", email: "lucas@puc.edu" },
-            points: 1104,
-            isCurrentUser: false,
-        },
-    ],
-};
-
 type UIState = "loading" | "error" | "success";
 
 export default function GroupsScreen() {
+    const { session } = useAuth();
     const [uiState, setUiState] = useState<UIState>("loading");
     const [data, setData] = useState<Group | null>(null);
 
@@ -83,8 +43,8 @@ export default function GroupsScreen() {
         setUiState("loading");
         setData(null);
         try {
-            await new Promise((r) => setTimeout(r, 800));
-            setData(MOCK_DATA);
+            const groupId = session!.student.groupId!;
+            setData(await getGroup(groupId));
             setUiState("success");
         } catch {
             setUiState("error");

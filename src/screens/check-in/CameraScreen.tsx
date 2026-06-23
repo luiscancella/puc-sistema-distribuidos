@@ -17,12 +17,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Colors, FontFamily, Radius, Shadow } from "../../constants/brand";
 import LogoMark from "../../components/LogoMark";
 import { CheckInStackParamList } from "../../types";
+import { getCurrentClass, CurrentClassSession } from "../../services/checkins";
 
 type TimerSeconds = 0 | 3 | 5;
-
-const MOCK_CLASS = {
-    courseName: "Engenharia de Software",
-};
 
 const TIMER_CYCLE: TimerSeconds[] = [0, 3, 5];
 const DARK_PILL = "rgba(31,26,46,0.60)";
@@ -37,6 +34,8 @@ export default function CameraScreen() {
     const [timerSeconds, setTimerSeconds] = useState<TimerSeconds>(0);
     const [countdown, setCountdown] = useState(0);
     const [error, setError] = useState<string | null>(null);
+    const [currentClass, setCurrentClass] = useState<CurrentClassSession | null>(null);
+    const [loadingClass, setLoadingClass] = useState(true);
 
     const cameraRef = useRef<CameraView>(null);
     const shutterScale = useRef(new Animated.Value(1)).current;
@@ -44,6 +43,13 @@ export default function CameraScreen() {
 
     useEffect(() => {
         return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    }, []);
+
+    useEffect(() => {
+        getCurrentClass()
+            .then(setCurrentClass)
+            .catch(() => setCurrentClass(null))
+            .finally(() => setLoadingClass(false));
     }, []);
 
     function animateShutter() {
@@ -54,6 +60,7 @@ export default function CameraScreen() {
     }
 
     async function capture() {
+        if (!currentClass) return;
         animateShutter();
         try {
             const [photo, location] = await Promise.all([
@@ -63,7 +70,8 @@ export default function CameraScreen() {
             if (!photo?.uri) throw new Error();
             navigation.navigate("Confirm", {
                 photoUri: photo.uri,
-                courseName: MOCK_CLASS.courseName,
+                courseName: currentClass.course.name,
+                classSessionId: currentClass.id,
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
             });
@@ -99,11 +107,33 @@ export default function CameraScreen() {
         setTimerSeconds(TIMER_CYCLE[next]);
     }
 
-    if (!permission || !locationPermission) {
+    if (!permission || !locationPermission || loadingClass) {
         return (
             <View style={styles.center}>
                 <ActivityIndicator color={Colors.peach} size="large" />
             </View>
+        );
+    }
+
+    if (!currentClass) {
+        return (
+            <SafeAreaView style={styles.center}>
+                <View style={styles.permissionCard}>
+                    <LogoMark size={52} />
+                    <View style={styles.permissionText}>
+                        <Text style={styles.permissionTitle}>Nenhuma aula agora.</Text>
+                        <Text style={styles.permissionBody}>
+                            O check-in só fica disponível durante o horário de uma aula do seu grupo.
+                        </Text>
+                    </View>
+                    <Pressable
+                        onPress={() => navigation.goBack()}
+                        style={({ pressed }) => [styles.primaryBtn, pressed && styles.btnPressed]}
+                    >
+                        <Text style={styles.primaryBtnText}>Voltar</Text>
+                    </Pressable>
+                </View>
+            </SafeAreaView>
         );
     }
 
@@ -171,7 +201,7 @@ export default function CameraScreen() {
                 <View style={styles.coursePill}>
                     <View style={styles.greenDot} />
                     <Text style={styles.coursePillText} numberOfLines={1}>
-                        {MOCK_CLASS.courseName}
+                        {currentClass.course.name}
                     </Text>
                 </View>
                 <Pressable

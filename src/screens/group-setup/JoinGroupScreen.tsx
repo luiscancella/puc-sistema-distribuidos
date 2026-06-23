@@ -18,13 +18,12 @@ import { z } from "zod";
 import { Colors, FontFamily, Radius, Shadow } from "../../constants/brand";
 import { useAuth } from "../../contexts/AuthContext";
 import { GroupSetupStackParamList } from "../../types";
+import { joinGroup } from "../../services/groups";
 
 const JoinGroupSchema = z.object({
     inviteCode: z.string("Insira o código").min(4, "Código inválido"),
 });
 type JoinGroupData = z.infer<typeof JoinGroupSchema>;
-
-const MOCK_GROUP_ID = "00000000-0000-4000-b000-000000000001";
 
 export default function JoinGroupScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<GroupSetupStackParamList>>();
@@ -38,12 +37,12 @@ export default function JoinGroupScreen() {
     const [loading, setLoading] = useState(false);
     const [globalError, setGlobalError] = useState<string | null>(null);
 
-    const onSubmit = async (_data: JoinGroupData) => {
+    const onSubmit = async (data: JoinGroupData) => {
         setGlobalError(null);
         setLoading(true);
         try {
-            // TODO: validate invite code against backend, get real groupId
-            await assignGroup(MOCK_GROUP_ID);
+            const { groupId } = await joinGroup(data.inviteCode);
+            await assignGroup(groupId);
         } catch {
             setGlobalError("Código inválido ou grupo não encontrado.");
         } finally {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { GroupSchema } from "../groups/group.schema";
+import { GroupMemberSchema } from "../groups/group.schema";
 
 export const StreakDataSchema = z.object({
     currentStreak: z.number().int().positive(),
@@ -16,9 +16,14 @@ export const CheckInStatusSchema = z.object({
 });
 export type CheckInStatus = z.infer<typeof CheckInStatusSchema>;
 
+export const HomeGroupSchema = z.object({
+    members: z.array(GroupMemberSchema),
+});
+export type HomeGroup = z.infer<typeof HomeGroupSchema>;
+
 export const HomeScreenDataSchema = z.object({
     streak: StreakDataSchema,
     checkIn: CheckInStatusSchema,
-    group: GroupSchema,
+    group: HomeGroupSchema.nullable(),
 });
 export type HomeScreenData = z.infer<typeof HomeScreenDataSchema>;

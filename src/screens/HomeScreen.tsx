@@ -20,6 +20,7 @@ import {
 	HomeScreenData,
 } from "../types";
 import { useAuth } from "../contexts/AuthContext";
+import { getHome } from "../services/home";
 
 type HomeNav = CompositeNavigationProp<
 	BottomTabNavigationProp<MainTabsParamList, "Home">,
@@ -70,61 +71,6 @@ function formatDateLabel(isoDate: string): string {
 	return `${weekday} ${monthStr} ${String(day).padStart(2, "0")}`;
 }
 
-const MOCK_DATA: HomeScreenData = {
-	streak: {
-		currentStreak: 7,
-		targetStreak: 7,
-		deadlineLabel: "2026-05-24T23:59:00.000Z",
-	},
-	checkIn: {
-		checkedInToday: false,
-		pointReward: 12,
-		dateLabel: "2026-05-24",
-	},
-	group: {
-		id: "00000000-0000-4000-a000-000000000010",
-		name: "Design '26",
-		university: { id: "00000000-0000-4000-a000-000000000020", name: "Universidade Federal", shortLabel: "UFMG" },
-		memberCount: 6,
-		memberLimit: 12,
-		inviteCode: "D26-PULL",
-		weeklyCheckIns: 32,
-		courses: [],
-		members: [
-			{
-				student: { id: "00000000-0000-4000-a000-000000000002", name: "Maya R.", email: "maya@puc.edu" },
-				points: 1840,
-				isCurrentUser: false,
-			},
-			{
-				student: { id: "00000000-0000-4000-a000-000000000001", name: "Você", email: "user@puc.edu" },
-				points: 1720,
-				isCurrentUser: true,
-			},
-			{
-				student: { id: "00000000-0000-4000-a000-000000000003", name: "Theo K.", email: "theo@puc.edu" },
-				points: 1605,
-				isCurrentUser: false,
-			},
-			{
-				student: { id: "00000000-0000-4000-a000-000000000004", name: "Bruno P.", email: "bruno@puc.edu" },
-				points: 1322,
-				isCurrentUser: false,
-			},
-			{
-				student: { id: "00000000-0000-4000-a000-000000000005", name: "Sara M.", email: "sara@puc.edu" },
-				points: 1280,
-				isCurrentUser: false,
-			},
-			{
-				student: { id: "00000000-0000-4000-a000-000000000006", name: "Lucas C.", email: "lucas@puc.edu" },
-				points: 1104,
-				isCurrentUser: false,
-			},
-		],
-	},
-};
-
 type UIState = "loading" | "error" | "success";
 
 export default function HomeScreen() {
@@ -143,10 +89,9 @@ export default function HomeScreen() {
 		setUiState("loading");
 		setData(null);
 
-		// Simulate API call
 		try {
-			await new Promise((r) => setTimeout(r, 800));
-			setData(MOCK_DATA);
+			const home = await getHome(student.id);
+			setData(home);
 			setUiState("success");
 		} catch {
 			setUiState("error");
@@ -265,7 +210,7 @@ export default function HomeScreen() {
 						</Pressable>
 					</View>
 					<View style={styles.squadList}>
-						{data!.group.members.slice(0, 3).map((entry, index) => {
+						{(data!.group?.members ?? []).slice(0, 3).map((entry, index) => {
 							const rank = index + 1;
 							const entryInitials = getInitials(entry.student.name);
 							return (
