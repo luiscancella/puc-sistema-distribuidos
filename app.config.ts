@@ -22,7 +22,8 @@ export default {
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "googleServicesFile": "./firebase/google-services.json",
     },
     "web": {
       "favicon": "./assets/favicon.png"
