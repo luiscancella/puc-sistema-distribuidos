@@ -53,7 +53,6 @@ export default function ConfirmScreen() {
 
     return (
         <SafeAreaView style={styles.root} edges={["top", "bottom"]}>
-            {/* Photo card */}
             <View style={styles.photoWrapper}>
                 <Image source={{ uri: photoUri }} style={styles.photo} />
                 <View style={styles.coursePill}>
@@ -64,7 +63,6 @@ export default function ConfirmScreen() {
                 </View>
             </View>
 
-            {/* Text */}
             <View style={styles.textBlock}>
                 <Text style={styles.title}>Ficou ótima.</Text>
                 <Text style={styles.subtitle}>Confirme para registrar sua presença.</Text>
@@ -76,7 +74,6 @@ export default function ConfirmScreen() {
                 </View>
             )}
 
-            {/* Buttons */}
             <View style={styles.footer}>
                 <Pressable
                     onPress={() => navigation.goBack()}
@@ -94,7 +91,6 @@ export default function ConfirmScreen() {
                 </Pressable>
             </View>
 
-            {/* Submitting overlay */}
             {submitting && (
                 <View style={styles.dimOverlay}>
                     <ActivityIndicator color="#fff" size="large" />

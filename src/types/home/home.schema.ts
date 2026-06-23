@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { GroupMemberSchema } from "../groups/group.schema";
+import { CourseSchema } from "../courses/course.schema";
 
 export const StreakDataSchema = z.object({
     currentStreak: z.number().int().positive(),
@@ -18,6 +19,7 @@ export type CheckInStatus = z.infer<typeof CheckInStatusSchema>;
 
 export const HomeGroupSchema = z.object({
     members: z.array(GroupMemberSchema),
+    courses: z.array(CourseSchema),
 });
 export type HomeGroup = z.infer<typeof HomeGroupSchema>;
 

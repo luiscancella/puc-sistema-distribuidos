@@ -167,7 +167,9 @@ export default function HomeScreen() {
 					</Pressable>
 				</View>
 
-				<View style={styles.streakCard}>
+				{
+					data && data.streak.currentStreak > 0 &&
+					<View style={styles.streakCard}>
 					<View style={styles.streakHeader}>
 						<View style={styles.streakIconWrap}>
 							<Ionicons name="flame" size={22} color={Colors.surface} />
@@ -182,6 +184,8 @@ export default function HomeScreen() {
 						</View>
 					</View>
 				</View>
+				}
+				
 
 				<View style={styles.checkInCard}>
 					<Text style={styles.checkInDate}>
