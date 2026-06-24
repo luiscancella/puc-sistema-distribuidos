@@ -34,7 +34,7 @@ export class TooFarError extends Error {
     }
 }
 
-export async function submitCheckIn(params: SubmitCheckInParams): Promise<CheckInResult> {
+function buildCheckInForm(params: SubmitCheckInParams) {
     const form = new FormData();
     form.append("classSessionId", params.classSessionId);
     form.append("latitude", String(params.latitude));
@@ -44,9 +44,12 @@ export async function submitCheckIn(params: SubmitCheckInParams): Promise<CheckI
         name: "checkin.jpg",
         type: "image/jpeg",
     } as unknown as Blob);
+    return form;
+}
 
+async function postCheckIn(params: SubmitCheckInParams): Promise<CheckInResult> {
     try {
-        const { data } = await apiClient.post<CheckInResult>("/check-ins", form, {
+        const { data } = await apiClient.post<CheckInResult>("/check-ins", buildCheckInForm(params), {
             headers: { "Content-Type": "multipart/form-data" },
         });
         return data;
@@ -57,6 +60,17 @@ export async function submitCheckIn(params: SubmitCheckInParams): Promise<CheckI
         }
         if (err?.response?.status === 409) {
             throw new Error("ALREADY_CHECKED_IN");
+        }
+        throw err;
+    }
+}
+
+export async function submitCheckIn(params: SubmitCheckInParams): Promise<CheckInResult> {
+    try {
+        return await postCheckIn(params);
+    } catch (err: any) {
+        if (err?.code === "ERR_NETWORK") {
+            return await postCheckIn(params);
         }
         throw err;
     }
