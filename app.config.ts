@@ -31,6 +31,7 @@ export default {
     "plugins": [
       "expo-font",
       "expo-secure-store",
+      "expo-notifications",
       [
         "expo-camera",
         {

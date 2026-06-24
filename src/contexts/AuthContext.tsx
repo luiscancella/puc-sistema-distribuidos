@@ -1,9 +1,18 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { AuthSession, SignInData, SignUpData } from "../types";
 import { signIn as signInRequest, signUp as signUpRequest } from "../services/auth";
-import { getProfile } from "../services/profile";
+import { getProfile, registerPushToken } from "../services/profile";
 import { getToken, saveToken, clearToken } from "../services/token";
 import { setAuthToken, setUnauthorizedHandler } from "../services/client";
+import { registerForPushNotifications } from "../services/push";
+
+const syncPushToken = () => {
+  registerForPushNotifications()
+    .then((token) => {
+      if (token) registerPushToken(token);
+    })
+    .catch(() => {});
+};
 
 type AuthContextType = {
   session: AuthSession | null;
@@ -38,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const profile = await getProfile();
           setSession({ token, student: profile.student });
+          syncPushToken();
         } catch {
           await clearToken();
           setAuthToken(null);
@@ -52,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await saveToken(result.token);
     setAuthToken(result.token);
     setSession(result);
+    syncPushToken();
   };
 
   const signUp = async (data: SignUpData) => {
@@ -59,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await saveToken(result.token);
     setAuthToken(result.token);
     setSession(result);
+    syncPushToken();
   };
 
   const assignGroup = async (groupId: string) => {
