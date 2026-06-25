@@ -225,7 +225,7 @@ export default function HomeScreen() {
 						</Pressable>
 					</View>
 					<View style={styles.squadList}>
-						{(group?.members ?? []).slice(0, 3).map((entry, index) => {
+						{(group?.members ?? []).slice().sort((a, b) => b.points - a.points).slice(0, 3).map((entry, index) => {
 							const rank = index + 1;
 							const entryInitials = getInitials(entry.student.name);
 							return (
