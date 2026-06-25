@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
 	ActivityIndicator,
 	Pressable,
@@ -16,6 +15,7 @@ import { Colors, FontFamily, Radius, Shadow } from "../constants/brand";
 import { AppStackParamList, ProfileScreenData } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import { getProfile } from "../services/profile";
+import { useOfflineResource } from "../hooks/useOfflineResource";
 
 type ProfileNav = NativeStackNavigationProp<AppStackParamList>;
 
@@ -32,30 +32,17 @@ function formatPoints(points: number): string {
 	return points.toLocaleString("pt-BR");
 }
 
-type UIState = "loading" | "error" | "success";
-
 export default function ProfileScreen() {
 	const navigation = useNavigation<ProfileNav>();
-	const { session, signOut } = useAuth();
+	const { session } = useAuth();
 	const student = session!.student;
 
-	const [uiState, setUiState] = useState<UIState>("loading");
-	const [data, setData] = useState<ProfileScreenData | null>(null);
+	const { data, loading, error, reload } = useOfflineResource<ProfileScreenData>(
+		`profile:${student.id}`,
+		getProfile,
+	);
 
-	const load = async () => {
-		setUiState("loading");
-		setData(null);
-		try {
-			setData(await getProfile());
-			setUiState("success");
-		} catch {
-			setUiState("error");
-		}
-	};
-
-	useEffect(() => { load(); }, []);
-
-	if (uiState === "loading") {
+	if (loading) {
 		return (
 			<SafeAreaView style={styles.centeredRoot} edges={["top", "bottom"]}>
 				<ActivityIndicator color={Colors.peach} size="large" />
@@ -63,7 +50,7 @@ export default function ProfileScreen() {
 		);
 	}
 
-	if (uiState === "error") {
+	if (error) {
 		return (
 			<SafeAreaView style={styles.centeredRoot} edges={["top", "bottom"]}>
 				<View style={styles.errorBox}>
@@ -73,7 +60,7 @@ export default function ProfileScreen() {
 						Não foi possível carregar seu perfil. Tente novamente.
 					</Text>
 					<Pressable
-						onPress={load}
+						onPress={reload}
 						style={({ pressed }) => [styles.retryBtn, pressed && styles.retryBtnPressed]}
 					>
 						<Text style={styles.retryBtnText}>Tentar novamente</Text>

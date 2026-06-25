@@ -1,10 +1,13 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { AuthSession, SignInData, SignUpData } from "../types";
+import { AuthSession, SignInData, SignUpData, Student } from "../types";
 import { signIn as signInRequest, signUp as signUpRequest } from "../services/auth";
 import { getProfile, registerPushToken } from "../services/profile";
 import { getToken, saveToken, clearToken } from "../services/token";
+import { readCache, writeCache, clearCache } from "../services/cache";
 import { setAuthToken, setUnauthorizedHandler } from "../services/client";
 import { registerForPushNotifications } from "../services/push";
+
+const STUDENT_CACHE_KEY = "auth:student";
 
 const syncPushToken = () => {
   registerForPushNotifications()
@@ -29,8 +32,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [restoring, setRestoring] = useState(true);
 
+  const persistSession = (next: AuthSession) => {
+    setSession(next);
+    writeCache(STUDENT_CACHE_KEY, next.student);
+  };
+
   const signOut = () => {
     clearToken();
+    clearCache(STUDENT_CACHE_KEY);
     setAuthToken(null);
     setSession(null);
   };
@@ -42,18 +51,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     (async () => {
       const token = await getToken();
-      if (token) {
-        setAuthToken(token);
-        try {
-          const profile = await getProfile();
-          setSession({ token, student: profile.student });
-          syncPushToken();
-        } catch {
-          await clearToken();
-          setAuthToken(null);
-        }
+      if (!token) {
+        setRestoring(false);
+        return;
       }
-      setRestoring(false);
+
+      setAuthToken(token);
+      const cachedStudent = await readCache<Student>(STUDENT_CACHE_KEY);
+
+      const refresh = () =>
+        getProfile()
+          .then((profile) => {
+            persistSession({ token, student: profile.student });
+            syncPushToken();
+          })
+          .catch(() => {});
+
+      if (cachedStudent) {
+        setSession({ token, student: cachedStudent });
+        setRestoring(false);
+        refresh();
+      } else {
+        await refresh();
+        setRestoring(false);
+      }
     })();
   }, []);
 
@@ -61,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await signInRequest(data);
     await saveToken(result.token);
     setAuthToken(result.token);
-    setSession(result);
+    persistSession(result);
     syncPushToken();
   };
 
@@ -69,13 +90,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await signUpRequest(data);
     await saveToken(result.token);
     setAuthToken(result.token);
-    setSession(result);
+    persistSession(result);
     syncPushToken();
   };
 
   const assignGroup = async (groupId: string) => {
     if (!session) return;
-    setSession({ ...session, student: { ...session.student, groupId } });
+    persistSession({ ...session, student: { ...session.student, groupId } });
   };
 
   return (

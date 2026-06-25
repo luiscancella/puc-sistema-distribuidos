@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Pressable,
@@ -15,31 +14,18 @@ import { Group } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import { getGroup } from "../services/groups";
 import { AVATAR_COLORS, getInitials } from "../utils/avatar";
-
-type UIState = "loading" | "error" | "success";
+import { useOfflineResource } from "../hooks/useOfflineResource";
 
 export default function GroupsScreen() {
     const { session } = useAuth();
-    const [uiState, setUiState] = useState<UIState>("loading");
-    const [data, setData] = useState<Group | null>(null);
+    const groupId = session!.student.groupId!;
 
-    const load = async () => {
-        setUiState("loading");
-        setData(null);
-        try {
-            const groupId = session!.student.groupId!;
-            setData(await getGroup(groupId));
-            setUiState("success");
-        } catch {
-            setUiState("error");
-        }
-    };
+    const { data, loading, error, reload } = useOfflineResource<Group>(
+        `group:${groupId}`,
+        () => getGroup(groupId), 
+    );
 
-    useEffect(() => {
-        load();
-    }, []);
-
-    if (uiState === "loading") {
+    if (loading) {
         return (
             <SafeAreaView style={styles.centeredRoot} edges={["top", "bottom"]}>
                 <ActivityIndicator color={Colors.peach} size="large" />
@@ -47,7 +33,7 @@ export default function GroupsScreen() {
         );
     }
 
-    if (uiState === "error") {
+    if (error) {
         return (
             <SafeAreaView style={styles.centeredRoot} edges={["top", "bottom"]}>
                 <View style={styles.errorBox}>
@@ -57,7 +43,7 @@ export default function GroupsScreen() {
                         Não foi possível carregar os dados. Tente novamente.
                     </Text>
                     <Pressable
-                        onPress={load}
+                        onPress={reload}
                         style={({ pressed }) => [styles.retryBtn, pressed && styles.retryBtnPressed]}
                     >
                         <Text style={styles.retryBtnText}>Tentar novamente</Text>

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
 	ActivityIndicator,
 	Pressable,
@@ -17,6 +16,7 @@ import { Colors, FontFamily, Radius, Shadow } from "../constants/brand";
 import { AppStackParamList, MainTabsParamList, HomeScreenData } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import { getHome } from "../services/home";
+import { useOfflineResource } from "../hooks/useOfflineResource";
 import { AVATAR_COLORS, getInitials } from "../utils/avatar";
 import {
 	WEEKDAY_SHORT,
@@ -42,40 +42,23 @@ const UPCOMING_CARD_COLORS = [
 
 const MEDALS: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
 
-type UIState = "loading" | "error" | "success";
-
 export default function HomeScreen() {
 	const navigation = useNavigation<HomeNav>();
 	const { session } = useAuth();
 	const student = session!.student;
 	const initials = getInitials(student.name);
 
-	const [uiState, setUiState] = useState<UIState>("loading");
-	const [data, setData] = useState<HomeScreenData | null>(null);
+	const { data, loading, error, reload } = useOfflineResource<HomeScreenData>(
+		`home:${student.id}`,
+		() => getHome(student.id),
+	);
 
 	const occurrences = data?.group ? getNextOccurrences(data.group.courses, new Date()) : [];
 	const nextOccurrence = occurrences[0] ?? null;
 
-	const load = async () => {
-		setUiState("loading");
-		setData(null);
-
-		try {
-			const home = await getHome(student.id);
-			setData(home);
-			setUiState("success");
-		} catch {
-			setUiState("error");
-		}
-	};
-
-	useEffect(() => {
-		load();
-	}, []);
-
 	const handleCheckIn = () => navigation.navigate("CheckIn", { screen: "Camera" });
 
-	if (uiState === "loading") {
+	if (loading) {
 		return (
 			<SafeAreaView style={styles.centeredRoot} edges={["top", "bottom"]}>
 				<ActivityIndicator color={Colors.peach} size="large" style={styles.shimSpinner} />
@@ -83,7 +66,7 @@ export default function HomeScreen() {
 		);
 	}
 
-	if (uiState === "error") {
+	if (error) {
 		return (
 			<SafeAreaView style={styles.centeredRoot} edges={["top", "bottom"]}>
 				<View style={styles.errorBox}>
@@ -93,7 +76,7 @@ export default function HomeScreen() {
 						Não foi possível carregar os dados. Tente novamente.
 					</Text>
 					<Pressable
-						onPress={load}
+						onPress={reload}
 						style={({ pressed }) => [styles.retryBtn, pressed && styles.retryBtnPressed]}
 					>
 						<Text style={styles.retryBtnText}>Tentar novamente</Text>
