@@ -1,7 +1,6 @@
 import axios from "axios";
-import Constants from "expo-constants";
 
-const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? "http://localhost:3000";
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export const apiClient = axios.create({
     baseURL: apiUrl,

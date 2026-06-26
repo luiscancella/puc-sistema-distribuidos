@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  android-build:
+    name: Build & Distribuir Android (preview)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android APK (EAS)
+        id: eas-build
+        run: |
+          BUILD_JSON=$(eas build --platform android --profile preview --non-interactive --json)
+          APK_URL=$(echo "$BUILD_JSON" | jq -r '.[0].artifacts.buildUrl')
+          echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
+
+      - name: Download APK
+        run: curl -L "${{ steps.eas-build.outputs.apk_url }}" -o app.apk
+
+      - name: Distribuir via Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: testers
+          file: app.apk
+          releaseNotes: "Build automático da branch main — commit ${{ github.sha }}"
+
+  # ios-build:
+  #   name: Build & Distribuir iOS (preview)
+  #   runs-on: ubuntu-latest
+  #   environment: dev
+
+  #   steps:
+  #     - name: Checkout Código
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #         cache: 'npm'
+
+  #     - name: Instalar Dependências
+  #       run: npm ci
+
+  #     - name: Setup EAS
+  #       uses: expo/expo-github-action@v8
+  #       with:
+  #         eas-version: latest
+  #         token: ${{ secrets.EXPO_TOKEN }}
+
+  #     - name: Build iOS IPA (EAS)
+  #       id: eas-build
+  #       run: |
+  #         BUILD_JSON=$(eas build --platform ios --profile preview --non-interactive --json)
+  #         IPA_URL=$(echo "$BUILD_JSON" | jq -r '.[0].artifacts.buildUrl')
+  #         echo "ipa_url=$IPA_URL" >> $GITHUB_OUTPUT
+
+  #     - name: Download IPA
+  #       run: curl -L "${{ steps.eas-build.outputs.ipa_url }}" -o app.ipa
+
+  #     - name: Distribuir via Firebase App Distribution
+  #       uses: wzieba/Firebase-Distribution-Github-Action@v1
+  #       with:
+  #         appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
+  #         token: ${{ secrets.FIREBASE_TOKEN }}
+  #         groups: testers
+  #         file: app.ipa
+  #         releaseNotes: "Build automático da branch main — commit ${{ github.sha }}"
