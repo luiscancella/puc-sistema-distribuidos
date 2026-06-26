@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { Colors, FontFamily, Radius, Shadow } from "../../constants/brand";
 import { CheckInStackParamList } from "../../types";
+import crashlytics from "@react-native-firebase/crashlytics";
 import { submitCheckIn, TooFarError } from "../../services/checkins";
 
 type ConfirmNav = NativeStackNavigationProp<CheckInStackParamList, "Confirm">;
@@ -44,6 +45,7 @@ export default function ConfirmScreen() {
             } else if (err instanceof Error && err.message === "ALREADY_CHECKED_IN") {
                 setError("Você já fez check-in nesta aula.");
             } else {
+                crashlytics().recordError(err instanceof Error ? err : new Error(String(err)));
                 setError("Não foi possível registrar sua presença. Tente novamente.");
             }
         } finally {

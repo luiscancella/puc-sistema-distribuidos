@@ -41,6 +41,8 @@ export default {
     },
     plugins: [
       withCleartextTraffic,
+      "@react-native-firebase/app",
+      "@react-native-firebase/crashlytics",
       "expo-font",
       "expo-secure-store",
       "expo-notifications",

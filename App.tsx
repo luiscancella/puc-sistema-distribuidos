@@ -1,10 +1,13 @@
 import { AppRoutes } from './src/routes/AppRoutes';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
