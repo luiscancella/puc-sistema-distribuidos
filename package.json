@@ -15,7 +15,19 @@
     "build:preview:android:local": "eas build --platform android --profile preview --local",
     "build:production:android:local": "eas build --platform android --profile production --local",
     "build:dev:ios": "eas build --platform ios --profile development",
-    "build:preview:ios:local": "eas build --platform ios --profile preview --local"
+    "build:preview:ios:local": "eas build --platform ios --profile preview --local",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFiles": ["./jest.setup.ts"],
+    "moduleNameMapper": {
+      "@react-native-async-storage/async-storage": "@react-native-async-storage/async-storage/jest/async-storage-mock"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*)"
+    ]
   },
   "dependencies": {
     "@expo-google-fonts/bricolage-grotesque": "^0.4.1",
@@ -35,6 +47,7 @@
     "expo-notifications": "~0.32.17",
     "expo-secure-store": "~15.0.8",
     "expo-status-bar": "~3.0.9",
+    "jest-expo": "~54.0.17",
     "react": "19.1.0",
     "react-hook-form": "^7.76.0",
     "react-native": "0.81.5",
@@ -43,6 +56,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^14.0.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.8.0",
     "@types/react": "~19.1.0",
     "typescript": "~5.9.2"
