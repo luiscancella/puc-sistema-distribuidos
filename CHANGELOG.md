@@ -4,6 +4,72 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.13.0] — 2026-06-26
+
+### Added
+- Firebase Crashlytics — global crash/error reporting via `@react-native-firebase/app` + `@react-native-firebase/crashlytics`
+- `src/components/ErrorBoundary.tsx` — top-level error boundary that reports caught errors to Crashlytics and renders a fallback UI
+- Test suite (`jest` + `jest-expo` + `@testing-library/react-native`): unit and integration tests for services (`auth`, `cache`, `checkins`, `home`, `token`), hooks (`useOfflineResource`), and utils (`avatar`, `schedule`)
+- `jest.setup.ts` and Jest config in `package.json`; `test` and `test:watch` scripts
+- `.github/workflows/ci.yml` — CI workflow for Android build
+- `README.md`
+
+### Changed
+- `EXPO_PUBLIC_API_URL` now points to the production API endpoint
+
+### Dependencies
+- Added `@react-native-firebase/app`, `@react-native-firebase/crashlytics`
+- Added (dev) `jest-expo`, `@testing-library/react-native`, `@types/jest`
+
+---
+
+## [0.12.0] — 2026-06-24 → 2026-06-25
+
+### Added
+- Offline-first support: `src/hooks/useOfflineResource.ts` and `src/services/cache.ts` cache main-tab data (via `@react-native-async-storage/async-storage`) and serve it while offline
+- Check-in submission now retries automatically on network errors
+
+### Changed
+- `HomeScreen` squad members sorted by points before rendering the top 3
+- Fixed app being unable to connect to the test server
+
+### Dependencies
+- Added `@react-native-async-storage/async-storage`
+
+---
+
+## [0.11.0] — 2026-06-22 → 2026-06-23
+
+### Added
+- Backend integration — full services layer under `src/services/` (`client`, `auth`, `token`, `home`, `groups`, `checkins`, `profile`, `universities`, `push`)
+- Push notifications via `expo-notifications` (`src/services/push.ts`)
+- Location permission and GPS coordinates captured in `CameraScreen` and `ConfirmScreen` (`expo-location`)
+- `HomeScreen` carousel showing upcoming classes; `src/utils/schedule.ts` for schedule logic
+- `src/utils/avatar.ts` — extracted avatar color and initials helpers
+- Firebase Google Services config (`firebase/google-services.json`) and `app.config.ts` updates
+- `src/types/profile/profile.schema.ts`
+
+### Changed
+- `AuthContext` reworked to authenticate against the backend and persist the session with `expo-secure-store`
+- `HomeScreen` — streak card now rendered conditionally; `HomeGroup` schema extended with `courses`
+- `home.schema.ts` updated so `HomeResponse` includes course data within the group
+
+### Dependencies
+- Added `expo-notifications`, `expo-location`, `expo-secure-store`
+
+---
+
+## [0.10.0] — 2026-05-28
+
+### Added
+- `ProfileScreen` — user profile screen, integrated into `MainNavigator`
+- `SettingsScreen` — settings screen, integrated into `MainNavigator`
+
+### Removed
+- `ScheduleScreen` and its standalone schedule tab/calendar view
+
+---
+
 ## [0.9.0] — 2026-05-25
 
 ### Added
